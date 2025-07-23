@@ -1,0 +1,49 @@
+{
+  "name": "electron-demo",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "node node_modules/electron/install.js"
+  },
+  "config": {
+    "electron": {
+      "mirror": "https://registry.npmmirror.com/-/binary/electron/"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/toolsetlink/tauri-demo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/toolsetlink/tauri-demo/issues"
+  },
+  "homepage": "https://github.com/toolsetlink/tauri-demo#readme",
+  "description": "",
+  "build": {
+    "appId": "com.example.electron-updater-demo",
+    "productName": "Electron Updater Demo",
+    "publish": [
+      {
+        "provider": "generic",
+        "url": "http://localhost:3000/"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.developer-tools"
+    }
+  },
+  "dependencies": {
+    "electron": "^37.2.3",
+    "electron-updater": "^6.6.2"
+  },
+  "devDependencies": {
+    "electron-builder": "^26.0.12",
+    "serve": "^14.2.4"
+  }
+}

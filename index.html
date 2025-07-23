@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electron 更新验证工具</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .version-info {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        button {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            background: #3498db;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+        .status-area {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 5px;
+            height: 150px;
+            overflow-y: auto;
+            margin-top: 1.5rem;
+            border: 1px solid #e1e4e8;
+        }
+        .update-available {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .error {
+            color: #e74c3c;
+        }
+        .progress-container {
+            margin-top: 1rem;
+            display: none;
+        }
+        .progress-bar {
+            height: 8px;
+            background: #e1e4e8;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #3498db;
+            width: 0%;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Electron 更新验证工具</h1>
+        
+        <div class="version-info">
+            当前版本: <span id="current-version">加载中...</span>
+        </div>
+        
+        <div class="controls">
+            <button id="check-update-btn">检查更新</button>
+            <button id="download-update-btn" disabled>下载更新</button>
+            <button id="install-update-btn" disabled>安装更新并重启</button>
+        </div>
+        
+        <div class="progress-container" id="progress-container">
+            <div>下载进度: <span id="progress-percent">0%</span></div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+        
+        <div class="status-area" id="status-area">
+            状态: 就绪
+        </div>
+    </div>
+
+    <script>
+        // 获取DOM元素
+        const currentVersionEl = document.getElementById('current-version');
+        const checkUpdateBtn = document.getElementById('check-update-btn');
+        const downloadUpdateBtn = document.getElementById('download-update-btn');
+        const installUpdateBtn = document.getElementById('install-update-btn');
+        const statusArea = document.getElementById('status-area');
+        const progressContainer = document.getElementById('progress-container');
+        const progressPercent = document.getElementById('progress-percent');
+        const progressFill = document.getElementById('progress-fill');
+
+        // 显示状态消息
+        function showStatus(message, isError = false) {
+            const statusLine = document.createElement('div');
+            statusLine.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            if (isError) statusLine.classList.add('error');
+            statusArea.prepend(statusLine);
+        }
+
+        // 初始化: 获取当前版本
+        async function initialize() {
+            try {
+                // 注意: 在preload.js中我们定义了getCurrentVersion，但在main.js中尚未实现对应的ipcMain.handle
+                // 这里暂时通过checkForUpdates间接获取当前版本
+                const result = await window.electronAPI.checkForUpdates();
+                currentVersionEl.textContent = result.currentVersion;
+                showStatus(`已加载应用，当前版本: ${result.currentVersion}`);
+            } catch (error) {
+                currentVersionEl.textContent = '获取失败';
+                showStatus(`初始化错误: ${error.message}`, true);
+            }
+        }
+
+        // 检查更新按钮事件
+        checkUpdateBtn.addEventListener('click', async () => {
+            checkUpdateBtn.disabled = true;
+            showStatus('正在检查更新...');
+
+            try {
+                const result = await window.electronAPI.checkForUpdates();
+                if (result.error) {
+                    showStatus(`检查更新失败: ${result.error}`, true);
+                } else if (result.updateAvailable) {
+                    showStatus(`发现新版本: ${result.newVersion} (当前版本: ${result.currentVersion})`, false);
+                    downloadUpdateBtn.disabled = false;
+                } else {
+                    showStatus(`当前已是最新版本: ${result.currentVersion}`);
+                }
+            } catch (error) {
+                showStatus(`检查更新时发生错误: ${error.message}`, true);
+            } finally {
+                checkUpdateBtn.disabled = false;
+            }
+        });
+
+        // 下载更新按钮事件
+        downloadUpdateBtn.addEventListener('click', async () => {
+            downloadUpdateBtn.disabled = true;
+            checkUpdateBtn.disabled = true;
+            progressContainer.style.display = 'block';
+            showStatus('开始下载更新...');
+
+            try {
+                const result = await window.electronAPI.downloadUpdate();
+                if (result.success) {
+                    showStatus('更新下载完成，准备安装');
+                    installUpdateBtn.disabled = false;
+                } else {
+                    showStatus(`下载失败: ${result.error}`, true);
+                    downloadUpdateBtn.disabled = false;
+                }
+            } catch (error) {
+                showStatus(`下载更新时发生错误: ${error.message}`, true);
+                downloadUpdateBtn.disabled = false;
+            } finally {
+                checkUpdateBtn.disabled = false;
+                progressContainer.style.display = 'none';
+            }
+        });
+
+        // 安装更新按钮事件
+        installUpdateBtn.addEventListener('click', () => {
+            showStatus('正在安装更新并重启应用...');
+            window.electronAPI.installUpdate();
+        });
+
+        // 监听更新事件
+        window.electronAPI.onUpdateAvailable((info) => {
+            showStatus(`检测到更新: ${info.version}`);
+            downloadUpdateBtn.disabled = false;
+        });
+
+        window.electronAPI.onUpdateDownloaded((info) => {
+            showStatus('更新已下载完成，准备安装');
+            installUpdateBtn.disabled = false;
+        });
+
+        window.electronAPI.onUpdateError((error) => {
+            showStatus(`更新错误: ${error}`, true);
+        });
+
+        // 初始化应用
+        initialize();
+    </script>
+</body>
+</html>
