@@ -27,10 +27,27 @@ function createWindow() {
 
 app.on('ready', () => {
   createWindow();
+  
+ 
+
   // 初始化自动更新
   autoUpdater.autoDownload = false; // 禁用自动下载，手动控制
   autoUpdater.forceDevUpdateConfig = true; // 强制开发环境更新配置检查
   autoUpdater.checkForUpdates();
+  autoUpdater.updateConfigPath = path.join(__dirname, "dev-update.yml");
+
+   // const FeedURL = `${this.httpUrl}/update?${paramsQuery}`;
+  const FeedURL = `http://0.0.0.0:8888/v1/electron/upgrade?electronKey=kPUtUMDIjBhS48q5771pow&versionName=0.0.0&appointVersionName=&devModelKey=&devKey=&platform=mac&target=dmg&arch=arm64`;
+  autoUpdater.setFeedURL({
+    url: FeedURL,
+    provider: 'generic',
+  });
+  // // 设置检测更新的地址 ,入参形如 ：http://localhost:3000/ee?osType=Windows_NT&osPlatform=x64&productName=X3AIClient&softwareVersion=1.0.0
+  autoUpdater.requestHeaders = {
+    'X-AccessKey': 'mui2W50H1j-OC4xD6PgQag',
+    'test': 'test'
+  };
+  
 });
 
 app.on('window-all-closed', () => {
@@ -49,6 +66,9 @@ app.on('activate', () => {
 ipcMain.handle('check-for-updates', async () => {
   try {
     const result = await autoUpdater.checkForUpdates();
+    // 打印
+    console.log(result);
+    
     if (!result || !result.updateInfo) {
       return {
         error: "无法获取更新信息",
@@ -76,6 +96,15 @@ ipcMain.handle('check-for-updates', async () => {
 // IPC通信：下载更新
 ipcMain.handle('download-update', async () => {
   try {
+    const result = await autoUpdater.checkForUpdates();
+    // 打印
+    console.log(result);
+
+    autoUpdater.setFeedURL({
+      url: result.updateInfo.url,
+      provider: 'generic',
+    });
+    
     await autoUpdater.downloadUpdate();
     return { success: true };
   } catch (error) {

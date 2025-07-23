@@ -1,7 +1,7 @@
 {
   "name": "electron-demo",
   "description": "A demo Electron application",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "author": {
     "name": "toolsetlink",
     "email": "toolsetlink@163.com"
@@ -10,6 +10,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "dev": "electron . --watch",
     "build:all": "npx electron-builder",
     "build:mac-arm64": "npx electron-builder --mac --arm64 --publish always --config.publish.channel=latest-arm64",
     "build:mac-x64": "npx electron-builder --mac --x64 --publish always --config.publish.channel=latest-x64",
@@ -42,9 +43,6 @@
     },
     "mac": {
       "category": "public.app-category.developer-tools",
-      "target": [
-        "dmg"
-      ],
       "artifactName": "${productName}-${version}-mac-${arch}.${ext}"
     },
     "linux": {
