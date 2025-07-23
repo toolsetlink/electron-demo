@@ -1,16 +1,20 @@
 {
   "name": "electron-demo",
+  "description": "A demo Electron application",
   "version": "1.0.0",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder",
+    "build": "APP_BUILDER_BIN_PATH=node_modules/app-builder-bin/mac/app-builder_amd64 electron-builder --mac --x64",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux",
+    "build:win": "electron-builder --win",
     "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "node node_modules/electron/install.js"
   },
   "config": {
     "electron": {
-      "mirror": "https://registry.npmmirror.com/-/binary/electron/"
+      "mirror": "https://cdn.npmmirror.com/binaries/electron/"
     }
   },
   "repository": {
@@ -24,26 +28,45 @@
     "url": "https://github.com/toolsetlink/tauri-demo/issues"
   },
   "homepage": "https://github.com/toolsetlink/tauri-demo#readme",
-  "description": "",
   "build": {
     "appId": "com.example.electron-updater-demo",
     "productName": "Electron Updater Demo",
     "publish": [
       {
-        "provider": "generic",
-        "url": "http://localhost:3000/"
+        "provider": "github",
+        "owner": "toolsetlink",
+        "repo": "electron-demo"
       }
     ],
     "mac": {
-      "category": "public.app-category.developer-tools"
+      "category": "public.app-category.developer-tools",
+      "target": [
+        "zip"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb",
+        "rpm"
+      ],
+      "category": "Utility"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "zip"
+      ],
+      "icon": "build/icon.ico"
     }
   },
   "dependencies": {
-    "electron": "^37.2.3",
+    "app-builder-bin": "^4.2.0",
     "electron-updater": "^6.6.2"
   },
   "devDependencies": {
-    "electron-builder": "^26.0.12",
+    "electron": "^37.2.3",
+    "electron-builder": "^24.13.3",
     "serve": "^14.2.4"
   }
 }
