@@ -2,13 +2,19 @@
   "name": "electron-demo",
   "description": "A demo Electron application",
   "version": "1.0.0",
+  "author": {
+    "name": "toolsetlink",
+    "email": "toolsetlink@163.com"
+  },
+  "email": "toolsetlink@163.com",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build": "APP_BUILDER_BIN_PATH=node_modules/app-builder-bin/mac/app-builder_amd64 electron-builder --mac --x64",
-    "build:mac": "electron-builder --mac",
-    "build:linux": "electron-builder --linux",
-    "build:win": "electron-builder --win",
+    "build:all": "npx electron-builder",
+    "build:mac-arm64": "npx electron-builder --mac --arm64",
+    "build:mac-x64": "npx electron-builder --mac --x64",
+    "build:win-x64": "npx electron-builder --win --x64",
+    "build:linux-x64": "npx electron-builder --linux --x64",
     "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "node node_modules/electron/install.js"
   },
@@ -22,7 +28,6 @@
     "url": "git+https://github.com/toolsetlink/tauri-demo.git"
   },
   "keywords": [],
-  "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/toolsetlink/tauri-demo/issues"
@@ -41,21 +46,19 @@
     "mac": {
       "category": "public.app-category.developer-tools",
       "target": [
-        "zip"
+        "dmg"
       ]
     },
     "linux": {
       "target": [
         "AppImage",
-        "deb",
-        "rpm"
+        "deb"
       ],
       "category": "Utility"
     },
     "win": {
       "target": [
-        "nsis",
-        "zip"
+        "portable"
       ],
       "icon": "build/icon.ico"
     }
