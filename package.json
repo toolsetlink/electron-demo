@@ -35,14 +35,7 @@
   "homepage": "https://github.com/toolsetlink/tauri-demo#readme",
   "build": {
     "appId": "com.example.electron-updater-demo",
-    "productName": "Electron Updater Demo",
-    "publish": [
-      {
-        "provider": "github",
-        "owner": "toolsetlink",
-        "repo": "electron-demo"
-      }
-    ],
+    "productName": "electron-demo",
     "mac": {
       "category": "public.app-category.developer-tools",
       "target": [
@@ -58,10 +51,14 @@
     },
     "win": {
       "target": [
-        "portable"
+        "nsis"
       ],
       "icon": "build/icon.ico"
     }
+  },
+  "publish": {
+    "provider": "generic",
+    "url": ""
   },
   "dependencies": {
     "app-builder-bin": "^4.2.0",
