@@ -11,10 +11,10 @@
   "scripts": {
     "start": "electron .",
     "build:all": "npx electron-builder",
-    "build:mac-arm64": "npx electron-builder --mac --arm64",
-    "build:mac-x64": "npx electron-builder --mac --x64",
-    "build:win-x64": "npx electron-builder --win --x64",
-    "build:linux-x64": "npx electron-builder --linux --x64",
+    "build:mac-arm64": "npx electron-builder --mac --arm64 --publish always --config.publish.channel=latest-arm64",
+    "build:mac-x64": "npx electron-builder --mac --x64 --publish always --config.publish.channel=latest-x64",
+    "build:win-x64": "npx electron-builder --win --x64 --publish always --config.publish.channel=latest-win-x64",
+    "build:linux-x64": "npx electron-builder --linux --x64 --publish always --config.publish.channel=latest-linux-x64",
     "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "node node_modules/electron/install.js"
   },
@@ -36,29 +36,32 @@
   "build": {
     "appId": "com.example.electron-updater-demo",
     "productName": "electron-demo",
+    "publish": {
+      "provider": "generic",
+      "url": "./dist/"
+    },
     "mac": {
       "category": "public.app-category.developer-tools",
       "target": [
         "dmg"
-      ]
+      ],
+      "artifactName": "${productName}-${version}-mac-${arch}.${ext}"
     },
     "linux": {
       "target": [
         "AppImage",
         "deb"
       ],
-      "category": "Utility"
+      "category": "Utility",
+      "artifactName": "${productName}-${version}-linux-${arch}.${ext}"
     },
     "win": {
       "target": [
         "nsis"
       ],
-      "icon": "build/icon.ico"
+      "icon": "build/icon.ico",
+      "artifactName": "${productName}-${version}-win-${arch}.${ext}"
     }
-  },
-  "publish": {
-    "provider": "generic",
-    "url": ""
   },
   "dependencies": {
     "app-builder-bin": "^4.2.0",
