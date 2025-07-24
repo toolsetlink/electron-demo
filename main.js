@@ -53,20 +53,16 @@ ipcMain.handle('check-for-updates', async () => {
   try {
     console.log(app.getVersion());
     console.log(process.platform);
-    console.log(process.target);
     console.log(process.arch);
 
     // const FeedURL = `${this.httpUrl}/update?${paramsQuery}`;
-    const FeedURL = `http://0.0.0.0:8888/v1/electron/upgrade?electronKey=kPUtUMDIjBhS48q5771pow&versionName=${app.getVersion()}&appointVersionName=&devModelKey=&devKey=&platform=${process.platform}&target=dmg&arch=${process.arch}`;
-
+    const FeedURL = `https://api.upgrade.toolsetlink.com/v1/electron/upgrade?electronKey=kPUtUMDIjBhS48q5771pow&versionName=${app.getVersion()}&appointVersionName=&devModelKey=&devKey=&platform=${process.platform}&arch=${process.arch}`;
     autoUpdater.setFeedURL({
       url: FeedURL,
       provider: 'generic',
     });
-    // // 设置检测更新的地址 ,入参形如 ：http://localhost:3000/ee?osType=Windows_NT&osPlatform=x64&productName=X3AIClient&softwareVersion=1.0.0
     autoUpdater.requestHeaders = {
       'X-AccessKey': 'mui2W50H1j-OC4xD6PgQag',
-      'test': 'test'
     };
 
     const result = await autoUpdater.checkForUpdates();
@@ -100,18 +96,20 @@ ipcMain.handle('check-for-updates', async () => {
 // IPC通信：下载更新
 ipcMain.handle('download-update', async () => {
   try {
-    // const FeedURL = `${this.httpUrl}/update?${paramsQuery}`;
-    const FeedURL = `http://0.0.0.0:8888/v1/electron/upgrade?electronKey=kPUtUMDIjBhS48q5771pow&versionName=${app.getVersion()}&appointVersionName=&devModelKey=&devKey=&platform=${process.platform}&target=dmg&arch=${process.arch}`;
+    console.log(app.getVersion());
+    console.log(process.platform);
+    console.log(process.arch);
+    
+    const FeedURL = `https://api.upgrade.toolsetlink.com/v1/electron/upgrade?electronKey=kPUtUMDIjBhS48q5771pow&versionName=${app.getVersion()}&appointVersionName=&devModelKey=&devKey=&platform=${process.platform}&arch=${process.arch}`;
     autoUpdater.setFeedURL({
       url: FeedURL,
       provider: 'generic',
     });
-    // // 设置检测更新的地址 ,入参形如 ：http://localhost:3000/ee?osType=Windows_NT&osPlatform=x64&productName=X3AIClient&softwareVersion=1.0.0
     autoUpdater.requestHeaders = {
       'X-AccessKey': 'mui2W50H1j-OC4xD6PgQag',
-      'test': 'test'
     };
     const result = await autoUpdater.checkForUpdates();
+
     // 打印
     console.log(result);
 

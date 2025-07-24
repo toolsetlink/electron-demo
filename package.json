@@ -47,16 +47,14 @@
     },
     "linux": {
       "target": [
-        "AppImage",
-        "zip"
+        "AppImage"
       ],
       "category": "Utility",
       "artifactName": "${productName}-${version}-linux-${arch}.${ext}"
     },
     "win": {
       "target": [
-        "nsis",
-        "zip"
+        "nsis"
       ],
       "icon": "build/icon.ico",
       "artifactName": "${productName}-${version}-win-${arch}.${ext}"
