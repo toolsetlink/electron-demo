@@ -27,27 +27,13 @@ function createWindow() {
 
 app.on('ready', () => {
   createWindow();
-  
- 
 
   // 初始化自动更新
   autoUpdater.autoDownload = false; // 禁用自动下载，手动控制
   autoUpdater.forceDevUpdateConfig = true; // 强制开发环境更新配置检查
-  autoUpdater.checkForUpdates();
+  // autoUpdater.checkForUpdates();
   autoUpdater.updateConfigPath = path.join(__dirname, "dev-update.yml");
 
-   // const FeedURL = `${this.httpUrl}/update?${paramsQuery}`;
-  const FeedURL = `http://0.0.0.0:8888/v1/electron/upgrade?electronKey=kPUtUMDIjBhS48q5771pow&versionName=0.0.0&appointVersionName=&devModelKey=&devKey=&platform=mac&target=dmg&arch=arm64`;
-  autoUpdater.setFeedURL({
-    url: FeedURL,
-    provider: 'generic',
-  });
-  // // 设置检测更新的地址 ,入参形如 ：http://localhost:3000/ee?osType=Windows_NT&osPlatform=x64&productName=X3AIClient&softwareVersion=1.0.0
-  autoUpdater.requestHeaders = {
-    'X-AccessKey': 'mui2W50H1j-OC4xD6PgQag',
-    'test': 'test'
-  };
-  
 });
 
 app.on('window-all-closed', () => {
@@ -65,6 +51,24 @@ app.on('activate', () => {
 // IPC通信：检查更新
 ipcMain.handle('check-for-updates', async () => {
   try {
+    console.log(app.getVersion());
+    console.log(process.platform);
+    console.log(process.target);
+    console.log(process.arch);
+
+    // const FeedURL = `${this.httpUrl}/update?${paramsQuery}`;
+    const FeedURL = `http://0.0.0.0:8888/v1/electron/upgrade?electronKey=kPUtUMDIjBhS48q5771pow&versionName=${app.getVersion()}&appointVersionName=&devModelKey=&devKey=&platform=${process.platform}&target=dmg&arch=${process.arch}`;
+
+    autoUpdater.setFeedURL({
+      url: FeedURL,
+      provider: 'generic',
+    });
+    // // 设置检测更新的地址 ,入参形如 ：http://localhost:3000/ee?osType=Windows_NT&osPlatform=x64&productName=X3AIClient&softwareVersion=1.0.0
+    autoUpdater.requestHeaders = {
+      'X-AccessKey': 'mui2W50H1j-OC4xD6PgQag',
+      'test': 'test'
+    };
+
     const result = await autoUpdater.checkForUpdates();
     // 打印
     console.log(result);
@@ -96,6 +100,17 @@ ipcMain.handle('check-for-updates', async () => {
 // IPC通信：下载更新
 ipcMain.handle('download-update', async () => {
   try {
+    // const FeedURL = `${this.httpUrl}/update?${paramsQuery}`;
+    const FeedURL = `http://0.0.0.0:8888/v1/electron/upgrade?electronKey=kPUtUMDIjBhS48q5771pow&versionName=${app.getVersion()}&appointVersionName=&devModelKey=&devKey=&platform=${process.platform}&target=dmg&arch=${process.arch}`;
+    autoUpdater.setFeedURL({
+      url: FeedURL,
+      provider: 'generic',
+    });
+    // // 设置检测更新的地址 ,入参形如 ：http://localhost:3000/ee?osType=Windows_NT&osPlatform=x64&productName=X3AIClient&softwareVersion=1.0.0
+    autoUpdater.requestHeaders = {
+      'X-AccessKey': 'mui2W50H1j-OC4xD6PgQag',
+      'test': 'test'
+    };
     const result = await autoUpdater.checkForUpdates();
     // 打印
     console.log(result);

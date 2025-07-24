@@ -1,7 +1,7 @@
 {
   "name": "electron-demo",
   "description": "A demo Electron application",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "author": {
     "name": "toolsetlink",
     "email": "toolsetlink@163.com"
@@ -48,14 +48,15 @@
     "linux": {
       "target": [
         "AppImage",
-        "deb"
+        "zip"
       ],
       "category": "Utility",
       "artifactName": "${productName}-${version}-linux-${arch}.${ext}"
     },
     "win": {
       "target": [
-        "nsis"
+        "nsis",
+        "zip"
       ],
       "icon": "build/icon.ico",
       "artifactName": "${productName}-${version}-win-${arch}.${ext}"
