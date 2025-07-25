@@ -129,44 +129,10 @@ ipcMain.handle('download-update', async () => {
       provider: 'generic',
     });
     
-    // 重新注册下载进度事件监听器
-    // autoUpdater.removeAllListeners('download-progress');
-    // autoUpdater.on('download-progress', (progressObj) => {
-    //   try {
-    //     const totalSize = progressObj.total || currentUpdateInfo?.size || 0;
-    //     const calculatedPercent = totalSize > 0 
-    //       ? Math.round((progressObj.transferred / totalSize) * 100)
-    //       : (progressObj.percent || 0);
-
-    //     console.log('[DEBUG] 计算后进度:', calculatedPercent, 'transferred:', progressObj.transferred, 'total:', totalSize);
-
-    //     if (mainWindow && mainWindow.webContents) {
-    //       mainWindow.webContents.send('download-progress', {
-    //         percent: calculatedPercent,
-    //         transferred: progressObj.transferred,
-    //         total: totalSize
-    //       });
-    //     } else {
-    //       console.log('[DEBUG] mainWindow不可用，无法发送进度更新');
-    //     }
-    //   } catch (error) {
-    //     console.error('[ERROR] 下载进度事件处理失败:', error);
-    //   }
-    // });
-    
     console.log('[流程] 下载更新开始，URL:', result.updateInfo.url);
     
     try {
       console.error('[DEBUG] 进入 try');
-
-      // // 验证URL可访问性
-      // const https = require('https');
-      // https.get(result.updateInfo.url, (res) => {
-      //   res.destroy();
-      // }).on('error', (e) => {
-      //   console.error('[DEBUG] URL请求错误:', e);
-      // });
-
       await autoUpdater.downloadUpdate();
       console.log('[流程] 下载更新完成');
     } catch (e) {
