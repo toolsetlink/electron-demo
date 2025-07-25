@@ -56,8 +56,8 @@ ipcMain.handle('check-for-updates', async () => {
     console.log(process.arch);
 
     // const FeedURL = `${this.httpUrl}/update?${paramsQuery}`;
-    // const FeedURL = `https://api.upgrade.toolsetlink.com/v1/electron/upgrade?downloadType=2&electronKey=kPUtUMDIjBhS48q5771pow&versionName=${app.getVersion()}&appointVersionName=&devModelKey=&devKey=&platform=${process.platform}&arch=${process.arch}`;
-    const FeedURL = `http://0.0.0.0:8888/v1/electron/upgrade?downloadType=2&electronKey=kPUtUMDIjBhS48q5771pow&versionName=${app.getVersion()}&appointVersionName=&devModelKey=&devKey=&platform=${process.platform}&arch=${process.arch}`;
+    // const FeedURL = `https://api.upgrade.toolsetlink.com/v1/electron/upgrade?electronKey=kPUtUMDIjBhS48q5771pow&versionName=${app.getVersion()}&appointVersionName=&devModelKey=&devKey=&platform=${process.platform}&arch=${process.arch}`;
+    const FeedURL = `http://0.0.0.0:8888/v1/electron/upgrade?electronKey=kPUtUMDIjBhS48q5771pow&versionName=${app.getVersion()}&appointVersionName=&devModelKey=&devKey=&platform=${process.platform}&arch=${process.arch}`;
     
     autoUpdater.setFeedURL({
       url: FeedURL,
@@ -149,6 +149,15 @@ autoUpdater.on('update-available', (info) => {
 
 autoUpdater.on('update-downloaded', (info) => {
   mainWindow.webContents.send('update-downloaded', info);
+});
+
+// 添加下载进度事件监听
+autoUpdater.on('download-progress', (progressObj) => {
+  mainWindow.webContents.send('download-progress', {
+    percent: progressObj.percent,
+    transferred: progressObj.transferred,
+    total: progressObj.total
+  });
 });
 
 autoUpdater.on('error', (error) => {

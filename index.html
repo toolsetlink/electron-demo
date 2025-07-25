@@ -149,6 +149,13 @@
             }
         }
 
+        // 监听下载进度更新
+        window.electronAPI.onDownloadProgress((progress) => {
+            const percent = Math.round(progress.percent || 0);
+            progressPercent.textContent = `${percent}%`;
+            progressFill.style.width = `${percent}%`;
+        });
+
         // 检查更新按钮事件
         checkUpdateBtn.addEventListener('click', async () => {
             checkUpdateBtn.disabled = true;

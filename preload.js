@@ -13,5 +13,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // 监听更新事件
   onUpdateAvailable: (callback) => ipcRenderer.on('update-available', (event, info) => callback(info)),
   onUpdateDownloaded: (callback) => ipcRenderer.on('update-downloaded', (event, info) => callback(info)),
-  onUpdateError: (callback) => ipcRenderer.on('update-error', (event, error) => callback(error))
+  onUpdateError: (callback) => ipcRenderer.on('update-error', (event, error) => callback(error)),
+  // 添加下载进度监听
+  onDownloadProgress: (callback) => ipcRenderer.on('download-progress', (event, progress) => callback(progress))
 });
