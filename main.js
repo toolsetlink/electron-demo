@@ -56,8 +56,8 @@ ipcMain.handle('check-for-updates', async () => {
     console.log(process.arch);
 
     // const FeedURL = `${this.httpUrl}/update?${paramsQuery}`;
-    // const FeedURL = `https://api.upgrade.toolsetlink.com/v1/electron/upgrade?electronKey=kPUtUMDIjBhS48q5771pow&versionName=${app.getVersion()}&appointVersionName=&devModelKey=&devKey=&platform=${process.platform}&arch=${process.arch}`;
-    const FeedURL = `http://0.0.0.0:8888/v1/electron/upgrade?electronKey=kPUtUMDIjBhS48q5771pow&versionName=${app.getVersion()}&appointVersionName=&devModelKey=&devKey=&platform=${process.platform}&arch=${process.arch}`;
+    const FeedURL = `https://api.upgrade.toolsetlink.com/v1/electron/upgrade?electronKey=kPUtUMDIjBhS48q5771pow&versionName=${app.getVersion()}&appointVersionName=&devModelKey=&devKey=&platform=${process.platform}&arch=${process.arch}`;
+    // const FeedURL = `http://0.0.0.0:8888/v1/electron/upgrade?electronKey=kPUtUMDIjBhS48q5771pow&versionName=${app.getVersion()}&appointVersionName=&devModelKey=&devKey=&platform=${process.platform}&arch=${process.arch}`;
     
     autoUpdater.setFeedURL({
       url: FeedURL,
@@ -110,8 +110,7 @@ ipcMain.handle('download-update', async () => {
     console.log(process.platform);
     console.log(process.arch);
 
-    // const FeedURL = `https://api.upgrade.toolsetlink.com/v1/electron/upgrade?electronKey=kPUtUMDIjBhS48q5771pow&versionName=${app.getVersion()}&appointVersionName=&devModelKey=&devKey=&platform=${process.platform}&arch=${process.arch}`;
-    const FeedURL = `http://0.0.0.0:8888/v1/electron/upgrade?electronKey=kPUtUMDIjBhS48q5771pow&versionName=${app.getVersion()}&appointVersionName=&devModelKey=&devKey=&platform=${process.platform}&arch=${process.arch}`;
+    const FeedURL = `https://api.upgrade.toolsetlink.com/v1/electron/upgrade?electronKey=kPUtUMDIjBhS48q5771pow&versionName=${app.getVersion()}&appointVersionName=&devModelKey=&devKey=&platform=${process.platform}&arch=${process.arch}`;
 
     autoUpdater.setFeedURL({
       url: FeedURL,
@@ -160,13 +159,13 @@ ipcMain.handle('download-update', async () => {
     try {
       console.error('[DEBUG] 进入 try');
 
-      // 验证URL可访问性
-      const https = require('https');
-      https.get(result.updateInfo.url, (res) => {
-        res.destroy();
-      }).on('error', (e) => {
-        console.error('[DEBUG] URL请求错误:', e);
-      });
+      // // 验证URL可访问性
+      // const https = require('https');
+      // https.get(result.updateInfo.url, (res) => {
+      //   res.destroy();
+      // }).on('error', (e) => {
+      //   console.error('[DEBUG] URL请求错误:', e);
+      // });
 
       await autoUpdater.downloadUpdate();
       console.log('[流程] 下载更新完成');
