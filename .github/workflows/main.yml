@@ -89,6 +89,8 @@ jobs:
   release:
     needs: publish-electron
     runs-on: ubuntu-22.04
+    permissions:
+      contents: write
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
