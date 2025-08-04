@@ -34,7 +34,7 @@ jobs:
       - name: setup node
         uses: actions/setup-node@v4
         with:
-          node - version: lts/*
+          node-version: lts/*
           cache: 'pnpm'
 
       - name: install Rust stable
@@ -48,14 +48,14 @@ jobs:
       - name: install dependencies (ubuntu only)
         if: startsWith(matrix.platform, 'ubuntu')
         run: |
-          sudo apt - get update
-          sudo apt - get install - y libwebkit2gtk - 4.1 - dev libappindicator3 - dev librsvg2 - dev patchelf xdg - utils
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils
 
       - name: install frontend dependencies
         run: pnpm install
 
       - name: Install rimraf
-        run: pnpm add rimraf - D
+        run: pnpm add rimraf -D
 
       - name: Build Electron App
         run: pnpm run dist
@@ -73,7 +73,7 @@ jobs:
           if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
             VERSION=${{ github.ref_name }}
           else
-            VERSION=$(node - p "require('./package.json').version")
+            VERSION=$(node -p "require('./package.json').version")
           fi
           echo "appVersion=$VERSION" >> $GITHUB_OUTPUT
           echo "Extracted version: $VERSION"
