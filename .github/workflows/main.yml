@@ -20,9 +20,11 @@ jobs:
           - platform: ubuntu-22.04
             target: x86_64-unknown-linux-gnu
             artifact-name: ubuntu-x86_64
+            arch-suffix: x64  # 补充x86_64架构的后缀
           - platform: ubuntu-22.04
             target: aarch64-unknown-linux-gnu
             artifact-name: ubuntu-aarch64
+            arch-suffix: arm64  # 补充aarch64架构的后缀
 
     runs-on: ${{ matrix.platform }}
     steps:
