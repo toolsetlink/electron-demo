@@ -64,10 +64,22 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Cleanup Artifacts for Linux
+      - name: Cleanup Artifacts for Linux (精确清理)
         if: startsWith(matrix.platform, 'ubuntu')
         run: |
-          pnpm exec rimraf "dist/!(*.AppImage|*.yml|*.zip)"
+          # 创建临时目录
+          mkdir -p dist-temp
+          
+          # 只保留需要的文件类型
+          find dist -maxdepth 1 -type f \( -name "*.AppImage" -o -name "*.yml" -o -name "*.zip" \) -exec cp {} dist-temp/ \;
+          
+          # 替换原dist目录
+          rm -rf dist
+          mv dist-temp dist
+          
+          # 显示保留的文件（用于调试）
+          echo "保留的发布文件："
+          ls -la dist
 
       - name: Rename files with architecture suffix
         if: startsWith(matrix.platform, 'ubuntu')
