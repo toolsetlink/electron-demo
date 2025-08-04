@@ -21,7 +21,9 @@
     "electron-forge_start": "electron-forge start",
     "electron-forge_package": "electron-forge package",
     "electron-forge_make": "electron-forge make",
-    "electron-forge_publish": "electron-forge publish"
+    "electron-forge_publish": "electron-forge publish",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder -p always"
   },
   "config": {
     "electron": {
