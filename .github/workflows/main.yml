@@ -23,33 +23,34 @@ jobs:
             artifact-name: ubuntu-x86_64
             arch-suffix: x64
             # 直接定义完整的构建命令，包含通道信息
-            build-command: "npx electron-builder --linux --x64 --publish always --config.publish.channel=latest-linux"
+#            build-command: "npx electron-builder --linux --x64 --publish always --config.publish.channel=latest-linux"
+            build-command: "npx electron-builder --linux --x64 --config.publish.channel=latest-linux"
 
           - platform: ubuntu-22.04
             target: aarch64-unknown-linux-gnu
             artifact-name: ubuntu-aarch64
             arch-suffix: arm64
-            build-command: "npx electron-builder --linux --arm64 --publish always --config.publish.channel=latest-linux"
+            build-command: "npx electron-builder --linux --arm64 --config.publish.channel=latest-linux"
 
           # macOS 平台
           - platform: macos-latest
             target: aarch64-apple-darwin
             artifact-name: macos-arm64
             arch-suffix: arm64
-            build-command: "npx electron-builder --mac --arm64 --publish always --config.publish.channel=latest-mac"
+            build-command: "npx electron-builder --mac --arm64 --config.publish.channel=latest-mac"
 
           - platform: macos-latest
             target: x86_64-apple-darwin
             artifact-name: macos-x64
             arch-suffix: x64
-            build-command: "npx electron-builder --mac --x64 --publish always --config.publish.channel=latest-mac"
+            build-command: "npx electron-builder --mac --x64 --config.publish.channel=latest-mac"
 
           # Windows 平台
           - platform: windows-latest
             target: x86_64-pc-windows-msvc
             artifact-name: windows-x64
             arch-suffix: x64
-            build-command: "npx electron-builder --win --x64 --publish always --config.publish.channel=latest-win"
+            build-command: "npx electron-builder --win --x64 --config.publish.channel=latest-win"
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -85,11 +86,11 @@ jobs:
         run: |
           brew install automake autoconf libtool
 
-      - name: install frontend dependencies
-        run: pnpm install
+#      - name: install frontend dependencies
+#        run: pnpm install
 
-      - name: Install rimraf
-        run: pnpm add rimraf -D
+#      - name: Install rimraf
+#        run: pnpm add rimraf -D
 
       - name: Build Electron App
         # 直接执行矩阵中定义的完整构建命令
@@ -97,65 +98,65 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Cleanup Artifacts for Linux
-        if: startsWith(matrix.platform, 'ubuntu')
-        run: |
-          mkdir -p dist-temp
-          find dist -maxdepth 1 -type f \( -name "*.AppImage" -o -name "*.yml" -o -name "*.zip" \) -exec cp {} dist-temp/ \;
-          rm -rf dist
-          mv dist-temp dist
-          echo "保留的发布文件："
-          ls -la dist
+#      - name: Cleanup Artifacts for Linux
+#        if: startsWith(matrix.platform, 'ubuntu')
+#        run: |
+#          mkdir -p dist-temp
+#          find dist -maxdepth 1 -type f \( -name "*.AppImage" -o -name "*.yml" -o -name "*.zip" \) -exec cp {} dist-temp/ \;
+#          rm -rf dist
+#          mv dist-temp dist
+#          echo "保留的发布文件："
+#          ls -la dist
+#
+#      - name: Cleanup Artifacts for macOS
+#        if: matrix.platform == 'macos-latest'
+#        run: |
+#          mkdir -p dist-temp
+#          find dist -maxdepth 1 -type f \( -name "*.dmg" -o -name "*.pkg" -o -name "*.zip" -o -name "*.yml" \) -exec cp {} dist-temp/ \;
+#          rm -rf dist
+#          mv dist-temp dist
+#          echo "保留的发布文件："
+#          ls -la dist
+#
+#      - name: Cleanup Artifacts for Windows
+#        if: matrix.platform == 'windows-latest'
+#        run: |
+#          New-Item -ItemType Directory -Path dist-temp -Force | Out-Null
+#          Get-ChildItem -Path dist -File | Where-Object {
+#              $_.Name -like "*.exe" -or $_.Name -like "*.msi" -or $_.Name -like "*.zip" -or $_.Name -like "*.yml"
+#          } | Copy-Item -Destination dist-temp/
+#          Remove-Item -Path dist -Recurse -Force
+#          Rename-Item -Path dist-temp -NewName dist
+#          Write-Host "保留的发布文件："
+#          Get-ChildItem -Path dist
 
-      - name: Cleanup Artifacts for macOS
-        if: matrix.platform == 'macos-latest'
-        run: |
-          mkdir -p dist-temp
-          find dist -maxdepth 1 -type f \( -name "*.dmg" -o -name "*.pkg" -o -name "*.zip" -o -name "*.yml" \) -exec cp {} dist-temp/ \;
-          rm -rf dist
-          mv dist-temp dist
-          echo "保留的发布文件："
-          ls -la dist
-
-      - name: Cleanup Artifacts for Windows
-        if: matrix.platform == 'windows-latest'
-        run: |
-          New-Item -ItemType Directory -Path dist-temp -Force | Out-Null
-          Get-ChildItem -Path dist -File | Where-Object {
-              $_.Name -like "*.exe" -or $_.Name -like "*.msi" -or $_.Name -like "*.zip" -or $_.Name -like "*.yml"
-          } | Copy-Item -Destination dist-temp/
-          Remove-Item -Path dist -Recurse -Force
-          Rename-Item -Path dist-temp -NewName dist
-          Write-Host "保留的发布文件："
-          Get-ChildItem -Path dist
-
-      - name: Rename files with architecture suffix (Linux/macOS)
-        if: startsWith(matrix.platform, 'ubuntu') || matrix.platform == 'macos-latest'
-        run: |
-          cd dist
-          
-          ARCH_SUFFIX="${{ matrix.arch-suffix }}"
-          if [ "$ARCH_SUFFIX" != "x64" ] && [ "$ARCH_SUFFIX" != "arm64" ]; then
-            echo "错误: 架构后缀不正确 - $ARCH_SUFFIX"
-            exit 1
-          fi
-          
-          for file in *; do
-            if [ -f "$file" ]; then
-              if [[ "$file" == *-"$ARCH_SUFFIX".* ]]; then
-                echo "文件已包含架构后缀: $file"
-              else
-                filename="${file%.*}"
-                extension="${file#$filename}"
-                new_filename="${filename}-${ARCH_SUFFIX}${extension}"
-                mv "$file" "$new_filename"
-                echo "重命名: $file -> $new_filename"
-              fi
-            fi
-          done
-          
-          echo "重命名后的文件:"
-          ls -l
+#      - name: Rename files with architecture suffix (Linux/macOS)
+#        if: startsWith(matrix.platform, 'ubuntu') || matrix.platform == 'macos-latest'
+#        run: |
+#          cd dist
+#
+#          ARCH_SUFFIX="${{ matrix.arch-suffix }}"
+#          if [ "$ARCH_SUFFIX" != "x64" ] && [ "$ARCH_SUFFIX" != "arm64" ]; then
+#            echo "错误: 架构后缀不正确 - $ARCH_SUFFIX"
+#            exit 1
+#          fi
+#
+#          for file in *; do
+#            if [ -f "$file" ]; then
+#              if [[ "$file" == *-"$ARCH_SUFFIX".* ]]; then
+#                echo "文件已包含架构后缀: $file"
+#              else
+#                filename="${file%.*}"
+#                extension="${file#$filename}"
+#                new_filename="${filename}-${ARCH_SUFFIX}${extension}"
+#                mv "$file" "$new_filename"
+#                echo "重命名: $file -> $new_filename"
+#              fi
+#            fi
+#          done
+#
+#          echo "重命名后的文件:"
+#          ls -l
 
       - name: Rename files with architecture suffix (Windows)
         if: matrix.platform == 'windows-latest'
@@ -215,15 +216,15 @@ jobs:
           path: artifacts
           merge-multiple: false
 
-      - name: Verify artifact files
-        run: |
-          echo "下载的文件结构:"
-          tree artifacts
-          
-          if [ -z "$(find artifacts -type f)" ]; then
-            echo "错误: 没有找到任何artifact文件"
-            exit 1
-          fi
+#      - name: Verify artifact files
+#        run: |
+#          echo "下载的文件结构:"
+#          tree artifacts
+#
+#          if [ -z "$(find artifacts -type f)" ]; then
+#            echo "错误: 没有找到任何artifact文件"
+#            exit 1
+#          fi
 
       - name: Prepare release files
         run: |
