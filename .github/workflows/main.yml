@@ -10,18 +10,17 @@ on:
 jobs:
   publish-electron:
     outputs:
-      appVersion: ${{ steps.set_output.outputs.appVersion }}
-
+      appVersion: ${{ steps.extract-version.outputs.appVersion }}
     permissions:
       contents: write
     strategy:
       fail-fast: false
       matrix:
         include:
-          - platform: ubuntu-22.04
-            target: x86_64-unknown-linux-gnu
-          - platform: ubuntu-22.04-arm
-            target: aarch64-unknown-linux-gnu
+          - platform: ubuntu - 22.04
+            target: x86_64 - unknown - linux - gnu
+          - platform: ubuntu - 22.04
+            target: aarch64 - unknown - linux - gnu
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -35,48 +34,46 @@ jobs:
       - name: setup node
         uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          node - version: lts/*
           cache: 'pnpm'
 
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: |
-            ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
-            ${{ matrix.platform == 'windows-latest' && matrix.target == 'aarch64-pc-windows-msvc' && 'aarch64-pc-windows-msvc' || '' }}
+            ${{ startsWith(matrix.platform, 'ubuntu') && matrix.target || '' }}
+            ${{ matrix.platform =='macos - latest' && 'aarch64 - apple - darwin,x86_64 - apple - darwin' || '' }}
+            ${{ matrix.platform == 'windows - latest' && matrix.target == 'aarch64 - pc - windows - msvc' && 'aarch64 - pc - windows - msvc' || '' }}
 
       - name: install dependencies (ubuntu only)
         if: startsWith(matrix.platform, 'ubuntu')
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils
+          sudo apt - get update
+          sudo apt - get install - y libwebkit2gtk - 4.1 - dev libappindicator3 - dev librsvg2 - dev patchelf xdg - utils
 
       - name: install frontend dependencies
         run: pnpm install
 
-      # 安装rimraf工具
       - name: Install rimraf
-        run: pnpm add -g rimraf
+        run: pnpm add rimraf - D
 
       - name: Build Electron App
         run: pnpm run dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 清理 artifacts，保留 AppImage 和 yml 文件
-#      - name: Cleanup Artifacts for Linux
-#        if: matrix.platform == 'ubuntu-22.04'
-#        run: |
-#          # 匹配所有不以 .AppImage 或 .yml 结尾的文件
-#          pnpm exec rimraf "dist/!(*.AppImage|*.yml)"
+      - name: Cleanup Artifacts for Linux
+        if: startsWith(matrix.platform, 'ubuntu')
+        run: |
+          pnpm exec rimraf "dist/!(*.AppImage|*.yml|*.zip)"
 
       - name: Extract version
-        id: extract-version
+        id: extract - version
         run: |
           if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
             VERSION=${{ github.ref_name }}
           else
-            VERSION=$(node -p "require('./package.json').version")
+            VERSION=$(node - p "require('./package.json').version")
           fi
           echo "appVersion=$VERSION" >> $GITHUB_OUTPUT
           echo "Extracted version: $VERSION"
@@ -87,6 +84,11 @@ jobs:
           name: ${{ matrix.platform }}
           path: dist
 
+  release:
+    needs: publish-electron
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/download-artifact@v4
       - name: release
         uses: softprops/action-gh-release@v0.1.14
         with:
@@ -97,4 +99,3 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: matrix.platform == 'ubuntu-22.04'
