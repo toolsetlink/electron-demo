@@ -18,13 +18,7 @@
     "build:linux-arm64": "npx electron-builder --linux --arm64 --publish always --config.publish.channel=latest-linux-arm64",
     "build:linux-x64": "npx electron-builder --linux --x64 --publish always --config.publish.channel=latest-linux-x64",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "node node_modules/electron/install.js",
-    "electron-forge_start": "electron-forge start",
-    "electron-forge_package": "electron-forge package",
-    "electron-forge_make": "electron-forge make",
-    "electron-forge_publish": "electron-forge publish",
-    "pack": "electron-builder --dir",
-    "dist": "electron-builder -p always"
+    "postinstall": "node node_modules/electron/install.js"
   },
   "config": {
     "electron": {
