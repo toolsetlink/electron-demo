@@ -69,6 +69,33 @@ jobs:
         run: |
           pnpm exec rimraf "dist/!(*.AppImage|*.yml|*.zip)"
 
+      - name: Rename files with architecture suffix
+        if: startsWith(matrix.platform, 'ubuntu')
+        run: |
+          # 进入dist目录
+          cd dist
+          
+          # 为AppImage文件添加架构后缀
+          for appimage in *.AppImage; do
+            if [ -f "$appimage" ]; then
+              mv "$appimage" "${appimage%.AppImage}-${{ matrix.arch-suffix }}.AppImage"
+            fi
+          done
+          
+          # 为yml文件添加架构后缀
+          for yml in *.yml; do
+            if [ -f "$yml" ]; then
+              mv "$yml" "${yml%.yml}-${{ matrix.arch-suffix }}.yml"
+            fi
+          done
+          
+          # 为zip文件添加架构后缀（如果有）
+          for zip in *.zip; do
+            if [ -f "$zip" ]; then
+              mv "$zip" "${zip%.zip}-${{ matrix.arch-suffix }}.zip"
+            fi
+          done
+
       - name: Extract version
         id: extract-version
         run: |
