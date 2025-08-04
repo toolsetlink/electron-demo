@@ -59,6 +59,23 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+
+      # 删除无用文件
+#      - name: Cleanup Artifacts for Windows
+#        if: matrix.platform == 'windows-latest'
+#        run: |
+#          npx rimraf "dist/!(*.exe)"
+#
+#      - name: Cleanup Artifacts for MacOS
+#        if: matrix.platform == 'macos-latest'
+#        run: |
+#          npx rimraf "dist/!(*.dmg)"
+
+      - name: Cleanup Artifacts for Linux
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          npx rimraf "dist/!(*.AppImage)"
+
       # 提取版本号（从package.json或标签中）
       - name: Extract version
         id: extract-version
