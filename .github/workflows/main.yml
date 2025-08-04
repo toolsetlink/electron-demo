@@ -55,7 +55,7 @@ jobs:
           targets: |
             ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
             ${{ matrix.platform == 'windows-latest' && matrix.target == 'aarch64-pc-windows-msvc' && 'aarch64-pc-windows-msvc' || '' }}
-      
+
 
       - name: install dependencies (ubuntu only)
         if: startsWith(matrix.platform, 'ubuntu')  # 修改条件，覆盖所有 Ubuntu 版本
@@ -91,7 +91,7 @@ jobs:
       - name: upload artifacts
         uses: actions/upload-artifact@v4.0.0
         with:
-          name: ${{ matrix.os }}
+          name: ${{ matrix.platform }}
           path: dist
 
       - name: release
@@ -101,3 +101,4 @@ jobs:
           files: "dist/**"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
