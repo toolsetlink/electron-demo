@@ -17,10 +17,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: ubuntu - 22.04
-            target: x86_64 - unknown - linux - gnu
-          - platform: ubuntu - 22.04
-            target: aarch64 - unknown - linux - gnu
+          - platform: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+          - platform: ubuntu-22.04
+            target: aarch64-unknown-linux-gnu
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -42,8 +42,8 @@ jobs:
         with:
           targets: |
             ${{ startsWith(matrix.platform, 'ubuntu') && matrix.target || '' }}
-            ${{ matrix.platform =='macos - latest' && 'aarch64 - apple - darwin,x86_64 - apple - darwin' || '' }}
-            ${{ matrix.platform == 'windows - latest' && matrix.target == 'aarch64 - pc - windows - msvc' && 'aarch64 - pc - windows - msvc' || '' }}
+            ${{ matrix.platform =='macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+            ${{ matrix.platform == 'windows-latest' && matrix.target == 'aarch64-pc-windows-msvc' && 'aarch64-pc-windows-msvc' || '' }}
 
       - name: install dependencies (ubuntu only)
         if: startsWith(matrix.platform, 'ubuntu')
