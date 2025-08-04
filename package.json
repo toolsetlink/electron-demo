@@ -15,7 +15,6 @@
     "build:mac-arm64": "npx electron-builder --mac --arm64 --publish always --config.publish.channel=latest-arm64",
     "build:mac-x64": "npx electron-builder --mac --x64 --publish always --config.publish.channel=latest-x64",
     "build:win-x64": "npx electron-builder --win --x64 --publish always --config.publish.channel=latest-win-x64",
-    "build:win-arm64": "npx electron-builder --win --arm64 --publish always --config.publish.channel=latest-win-arm64",
     "build:linux-arm64": "npx electron-builder --linux --arm64 --publish always --config.publish.channel=latest-linux-arm64",
     "build:linux-x64": "npx electron-builder --linux --x64 --publish always --config.publish.channel=latest-linux-x64",
     "test": "echo \"Error: no test specified\" && exit 1",
