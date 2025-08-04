@@ -64,11 +64,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # 清理 artifacts，保留 AppImage 和 yml 文件
-      - name: Cleanup Artifacts for Linux
-        if: matrix.platform == 'ubuntu-22.04'
-        run: |
-          # 匹配所有不以 .AppImage 或 .yml 结尾的文件
-          pnpm exec rimraf "dist/!(*.AppImage|*.yml)"
+#      - name: Cleanup Artifacts for Linux
+#        if: matrix.platform == 'ubuntu-22.04'
+#        run: |
+#          # 匹配所有不以 .AppImage 或 .yml 结尾的文件
+#          pnpm exec rimraf "dist/!(*.AppImage|*.yml)"
 
       - name: Extract version
         id: extract-version
