@@ -19,8 +19,10 @@ jobs:
         include:
           - platform: ubuntu-22.04
             target: x86_64-unknown-linux-gnu
+            artifact-name: ubuntu-x86_64
           - platform: ubuntu-22.04
             target: aarch64-unknown-linux-gnu
+            artifact-name: ubuntu-aarch64
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -42,7 +44,7 @@ jobs:
         with:
           targets: |
             ${{ startsWith(matrix.platform, 'ubuntu') && matrix.target || '' }}
-            ${{ matrix.platform =='macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+            ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
             ${{ matrix.platform == 'windows-latest' && matrix.target == 'aarch64-pc-windows-msvc' && 'aarch64-pc-windows-msvc' || '' }}
 
       - name: install dependencies (ubuntu only)
@@ -81,19 +83,29 @@ jobs:
       - name: upload artifacts
         uses: actions/upload-artifact@v4.0.0
         with:
-          name: ${{ matrix.platform }}
+          name: ${{ matrix.artifact-name }}  # 使用矩阵中定义的唯一名称
           path: dist
 
   release:
     needs: publish-electron
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/download-artifact@v4
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts  # 下载到artifacts目录
+
+      - name: Prepare release files
+        run: |
+          # 创建dist目录并收集所有产物
+          mkdir -p dist
+          cp -R artifacts/*/* dist/  # 将所有artifact中的文件复制到dist
+
       - name: release
         uses: softprops/action-gh-release@v0.1.14
         with:
-          tag_name: ${{ steps.extract-version.outputs.appVersion }}
-          name: Release ${{ steps.extract-version.outputs.appVersion }}
+          tag_name: ${{ needs.publish-electron.outputs.appVersion }}
+          name: Release ${{ needs.publish-electron.outputs.appVersion }}
           files: "dist/**"
           draft: false
           prerelease: false
