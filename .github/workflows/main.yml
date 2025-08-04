@@ -5,7 +5,7 @@ on:
     branches:
       - main
     tags:
-      - '*.*.*'
+      - 'v*.*.*'
 
 jobs:
   publish-electron:
@@ -127,36 +127,23 @@ jobs:
           cd dist
           
           ARCH_SUFFIX="${{ matrix.arch-suffix }}"
-          PLATFORM_NAME="${{ matrix.platform-name }}"
-          
           if [ "$ARCH_SUFFIX" != "x64" ] && [ "$ARCH_SUFFIX" != "arm64" ]; then
-          echo "错误: 架构后缀不正确 - $ARCH_SUFFIX"
-          exit 1
+            echo "错误: 架构后缀不正确 - $ARCH_SUFFIX"
+            exit 1
           fi
           
           for file in *; do
-          if [ -f "$file" ]; then
-           # 处理yml文件的特殊命名
-           if [[ "$file" == *.yml ]]; then
-             # 移除文件名中可能存在的平台名重复
-             base_name=$(echo "$file" | sed "s/-$PLATFORM_NAME//g")
-             # 确保文件名格式为 latest-平台-架构.yml
-             new_filename="latest-$PLATFORM_NAME-$ARCH_SUFFIX.yml"
-             mv "$file" "$new_filename"
-             echo "重命名YML: $file -> $new_filename"
-           else
-             # 处理其他文件
-             if [[ "$file" == *-"$ARCH_SUFFIX".* ]]; then
-               echo "文件已包含架构后缀: $file"
-             else
-               filename="${file%.*}"
-               extension="${file#$filename}"
-               new_filename="${filename}-${ARCH_SUFFIX}${extension}"
-               mv "$file" "$new_filename"
-               echo "重命名: $file -> $new_filename"
-             fi
-           fi
-          fi
+            if [ -f "$file" ]; then
+              if [[ "$file" == *-"$ARCH_SUFFIX".* ]]; then
+                echo "文件已包含架构后缀: $file"
+              else
+                filename="${file%.*}"
+                extension="${file#$filename}"
+                new_filename="${filename}-${ARCH_SUFFIX}${extension}"
+                mv "$file" "$new_filename"
+                echo "重命名: $file -> $new_filename"
+              fi
+            fi
           done
           
           echo "重命名后的文件:"
@@ -168,8 +155,6 @@ jobs:
           cd dist
           
           $ARCH_SUFFIX = "${{ matrix.arch-suffix }}"
-          $PLATFORM_NAME = "${{ matrix.platform-name }}"
-          
           if ($ARCH_SUFFIX -ne "x64" -and $ARCH_SUFFIX -ne "arm64") {
             Write-Error "错误: 架构后缀不正确 - $ARCH_SUFFIX"
             exit 1
@@ -177,20 +162,9 @@ jobs:
           
           Get-ChildItem -File | ForEach-Object {
             $file = $_
-            # 处理yml文件的特殊命名
-            if ($file.Name -like "*.yml") {
-              # 移除文件名中可能存在的平台名重复
-              $baseName = $file.Name -replace "-$PLATFORM_NAME", ""
-              # 确保文件名格式为 latest-平台-架构.yml
-              $newFileName = "latest-$PLATFORM_NAME-$ARCH_SUFFIX.yml"
-              Rename-Item -Path $file.FullName -NewName $newFileName
-              Write-Host "重命名YML: $($file.Name) -> $newFileName"
-            }
-            # 处理其他文件
-            elseif ($file.Name -match "-$ARCH_SUFFIX\.[^.]+$") {
+            if ($file.Name -match "-$ARCH_SUFFIX\.[^.]+$") {
               Write-Host "文件已包含架构后缀: $($file.Name)"
-            }
-            else {
+            } else {
               $filename = $file.BaseName
               $extension = $file.Extension
               $new_filename = "$filename-$ARCH_SUFFIX$extension"
@@ -201,12 +175,11 @@ jobs:
           
           Write-Host "重命名后的文件:"
           Get-ChildItem -File
-      
 
       - name: Extract version
         id: extract-version
         run: |
-          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
             VERSION=${{ github.ref_name }}
           else
             VERSION=$(node -p "require('./package.json').version")
