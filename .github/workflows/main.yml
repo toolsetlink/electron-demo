@@ -126,19 +126,29 @@ jobs:
         run: |
           cd dist
           
-          ARCH_SUFFIX="${{ matrix.arch-suffix }}"
-          if [ "$ARCH_SUFFIX" != "x64" ] && [ "$ARCH_SUFFIX" != "arm64" ]; then
-            echo "错误: 架构后缀不正确 - $ARCH_SUFFIX"
-            exit 1
-          fi
-          
           for file in *; do
             if [ -f "$file" ]; then
-              if [[ "$file" == *-"$ARCH_SUFFIX".* ]]; then
-                echo "文件已包含架构后缀: $file"
+              # 处理重复的平台标识（如-linux-linux或-mac-mac）
+              filename="${file%.*}"
+              extension="${file#$filename}"
+          
+              # 替换重复的平台名称
+              if [[ "$filename" == *-"$PLATFORM_NAME"-"$PLATFORM_NAME"* ]]; then
+                filename=$(echo "$filename" | sed "s/-$PLATFORM_NAME-$PLATFORM_NAME/-$PLATFORM_NAME/g")
+                echo "修复重复平台标识: $file -> $filename$extension"
+              fi
+          
+              # 检查是否已包含架构后缀
+              if [[ "$filename" == *-"$ARCH_SUFFIX" ]]; then
+                # 如果已经包含正确的架构后缀，仅应用重复平台修复
+                if [ "$file" != "$filename$extension" ]; then
+                  mv "$file" "$filename$extension"
+                  echo "重命名: $file -> $filename$extension"
+                else
+                  echo "文件已包含正确标识: $file"
+                fi
               else
-                filename="${file%.*}"
-                extension="${file#$filename}"
+                # 否则添加架构后缀
                 new_filename="${filename}-${ARCH_SUFFIX}${extension}"
                 mv "$file" "$new_filename"
                 echo "重命名: $file -> $new_filename"
