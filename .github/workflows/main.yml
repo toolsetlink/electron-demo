@@ -22,25 +22,29 @@ jobs:
             target: x86_64-unknown-linux-gnu
             artifact-name: ubuntu-x86_64
             arch-suffix: x64
+            channel: latest-linux  # 简化通道名称
             build-command: build:linux-x64
 
           - platform: ubuntu-22.04
             target: aarch64-unknown-linux-gnu
             artifact-name: ubuntu-aarch64
             arch-suffix: arm64
-            build-command: build:linux-arm64  # 假设你会添加这个命令
+            channel: latest-linux  # 简化通道名称
+            build-command: build:linux-arm64
 
           # macOS 平台
           - platform: macos-latest
             target: aarch64-apple-darwin
             artifact-name: macos-arm64
             arch-suffix: arm64
+            channel: latest-mac  # 简化通道名称
             build-command: build:mac-arm64
 
           - platform: macos-latest
             target: x86_64-apple-darwin
             artifact-name: macos-x64
             arch-suffix: x64
+            channel: latest-mac  # 简化通道名称
             build-command: build:mac-x64
 
           # Windows 平台
@@ -48,6 +52,7 @@ jobs:
             target: x86_64-pc-windows-msvc
             artifact-name: windows-x64
             arch-suffix: x64
+            channel: latest-win  # 简化通道名称
             build-command: build:win-x64
 
     runs-on: ${{ matrix.platform }}
@@ -94,57 +99,38 @@ jobs:
         run: pnpm run ${{ matrix.build-command }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # 传递通道环境变量，在package.json脚本中使用
+          PUBLISH_CHANNEL: ${{ matrix.channel }}
 
       - name: Cleanup Artifacts for Linux
         if: startsWith(matrix.platform, 'ubuntu')
         run: |
-          # 创建临时目录
           mkdir -p dist-temp
-          
-          # 只保留需要的文件类型
           find dist -maxdepth 1 -type f \( -name "*.AppImage" -o -name "*.yml" -o -name "*.zip" \) -exec cp {} dist-temp/ \;
-          
-          # 替换原dist目录
           rm -rf dist
           mv dist-temp dist
-          
-          # 显示保留的文件（用于调试）
           echo "保留的发布文件："
           ls -la dist
 
       - name: Cleanup Artifacts for macOS
         if: matrix.platform == 'macos-latest'
         run: |
-          # 创建临时目录
           mkdir -p dist-temp
-          
-          # 只保留需要的文件类型
           find dist -maxdepth 1 -type f \( -name "*.dmg" -o -name "*.pkg" -o -name "*.zip" -o -name "*.yml" \) -exec cp {} dist-temp/ \;
-          
-          # 替换原dist目录
           rm -rf dist
           mv dist-temp dist
-          
-          # 显示保留的文件（用于调试）
           echo "保留的发布文件："
           ls -la dist
 
       - name: Cleanup Artifacts for Windows
         if: matrix.platform == 'windows-latest'
         run: |
-          # 创建临时目录
           New-Item -ItemType Directory -Path dist-temp -Force | Out-Null
-          
-          # 只保留需要的文件类型
           Get-ChildItem -Path dist -File | Where-Object {
               $_.Name -like "*.exe" -or $_.Name -like "*.msi" -or $_.Name -like "*.zip" -or $_.Name -like "*.yml"
           } | Copy-Item -Destination dist-temp/
-          
-          # 替换原dist目录
           Remove-Item -Path dist -Recurse -Force
           Rename-Item -Path dist-temp -NewName dist
-          
-          # 显示保留的文件（用于调试）
           Write-Host "保留的发布文件："
           Get-ChildItem -Path dist
 
@@ -153,17 +139,14 @@ jobs:
         run: |
           cd dist
           
-          # 确保架构后缀正确
           ARCH_SUFFIX="${{ matrix.arch-suffix }}"
           if [ "$ARCH_SUFFIX" != "x64" ] && [ "$ARCH_SUFFIX" != "arm64" ]; then
             echo "错误: 架构后缀不正确 - $ARCH_SUFFIX"
             exit 1
           fi
           
-          # 重命名文件
           for file in *; do
             if [ -f "$file" ]; then
-              # 处理文件名，避免双重后缀
               if [[ "$file" == *-"$ARCH_SUFFIX".* ]]; then
                 echo "文件已包含架构后缀: $file"
               else
@@ -176,7 +159,6 @@ jobs:
             fi
           done
           
-          # 显示重命名后的文件
           echo "重命名后的文件:"
           ls -l
 
@@ -217,14 +199,14 @@ jobs:
           fi
           echo "appVersion=$VERSION" >> $GITHUB_OUTPUT
           echo "Extracted version: $VERSION"
-        shell: bash  # 统一使用bash确保跨平台兼容性
+        shell: bash
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4.0.0
         with:
           name: ${{ matrix.artifact-name }}
           path: dist/*
-          if-no-files-found: error  # 如果没有文件则报错
+          if-no-files-found: error
 
   release:
     needs: publish-electron
@@ -236,14 +218,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: artifacts
-          merge-multiple: false  # 保持每个artifact的独立目录
+          merge-multiple: false
 
       - name: Verify artifact files
         run: |
           echo "下载的文件结构:"
           tree artifacts
           
-          # 检查是否有文件
           if [ -z "$(find artifacts -type f)" ]; then
             echo "错误: 没有找到任何artifact文件"
             exit 1
@@ -252,11 +233,7 @@ jobs:
       - name: Prepare release files
         run: |
           mkdir -p release-files
-          
-          # 复制所有文件到发布目录
           find artifacts -type f -exec cp {} release-files/ \;
-          
-          # 显示要发布的文件
           echo "准备发布的文件:"
           ls -l release-files
 
