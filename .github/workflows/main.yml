@@ -68,7 +68,7 @@ jobs:
           pnpm exec rimraf "dist/!(*.AppImage|*.yml|*.zip)"
 
       - name: Extract version
-        id: extract - version
+        id: extract-version
         run: |
           if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
             VERSION=${{ github.ref_name }}
