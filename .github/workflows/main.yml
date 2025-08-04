@@ -23,34 +23,33 @@ jobs:
             artifact-name: ubuntu-x86_64
             arch-suffix: x64
             # 直接定义完整的构建命令，包含通道信息
-#            build-command: "npx electron-builder --linux --x64 --publish always --config.publish.channel=latest-linux"
-            build-command: "npx electron-builder --linux --x64 --config.publish.channel=latest-linux"
+            build-command: "npx electron-builder --linux --x64 --publish always --config.publish.channel=latest-linux"
 
           - platform: ubuntu-22.04
             target: aarch64-unknown-linux-gnu
             artifact-name: ubuntu-aarch64
             arch-suffix: arm64
-            build-command: "npx electron-builder --linux --arm64 --config.publish.channel=latest-linux"
+            build-command: "npx electron-builder --linux --arm64 --publish always --config.publish.channel=latest-linux"
 
           # macOS 平台
           - platform: macos-latest
             target: aarch64-apple-darwin
             artifact-name: macos-arm64
             arch-suffix: arm64
-            build-command: "npx electron-builder --mac --arm64 --config.publish.channel=latest-mac"
+            build-command: "npx electron-builder --mac --arm64 --publish always --config.publish.channel=latest-mac"
 
           - platform: macos-latest
             target: x86_64-apple-darwin
             artifact-name: macos-x64
             arch-suffix: x64
-            build-command: "npx electron-builder --mac --x64 --config.publish.channel=latest-mac"
+            build-command: "npx electron-builder --mac --x64 --publish always --config.publish.channel=latest-mac"
 
           # Windows 平台
           - platform: windows-latest
             target: x86_64-pc-windows-msvc
             artifact-name: windows-x64
             arch-suffix: x64
-            build-command: "npx electron-builder --win --x64 --config.publish.channel=latest-win"
+            build-command: "npx electron-builder --win --x64 --publish always --config.publish.channel=latest-win"
 
     runs-on: ${{ matrix.platform }}
     steps:
