@@ -17,14 +17,38 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # Linux 平台
           - platform: ubuntu-22.04
             target: x86_64-unknown-linux-gnu
             artifact-name: ubuntu-x86_64
-            arch-suffix: x64  # 补充x86_64架构的后缀
+            arch-suffix: x64
+            build-command: build:linux-x64
+
           - platform: ubuntu-22.04
             target: aarch64-unknown-linux-gnu
             artifact-name: ubuntu-aarch64
-            arch-suffix: arm64  # 补充aarch64架构的后缀
+            arch-suffix: arm64
+            build-command: build:linux-arm64  # 假设你会添加这个命令
+
+          # macOS 平台
+          - platform: macos-latest
+            target: aarch64-apple-darwin
+            artifact-name: macos-arm64
+            arch-suffix: arm64
+            build-command: build:mac-arm64
+
+          - platform: macos-latest
+            target: x86_64-apple-darwin
+            artifact-name: macos-x64
+            arch-suffix: x64
+            build-command: build:mac-x64
+
+          # Windows 平台
+          - platform: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact-name: windows-x64
+            arch-suffix: x64
+            build-command: build:win-x64
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -46,14 +70,19 @@ jobs:
         with:
           targets: |
             ${{ startsWith(matrix.platform, 'ubuntu') && matrix.target || '' }}
-            ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
-            ${{ matrix.platform == 'windows-latest' && matrix.target == 'aarch64-pc-windows-msvc' && 'aarch64-pc-windows-msvc' || '' }}
+            ${{ matrix.platform == 'macos-latest' && matrix.target || '' }}
+            ${{ matrix.platform == 'windows-latest' && matrix.target || '' }}
 
       - name: install dependencies (ubuntu only)
         if: startsWith(matrix.platform, 'ubuntu')
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils
+
+      - name: install dependencies (macos only)
+        if: matrix.platform == 'macos-latest'
+        run: |
+          brew install automake autoconf libtool
 
       - name: install frontend dependencies
         run: pnpm install
@@ -62,11 +91,11 @@ jobs:
         run: pnpm add rimraf -D
 
       - name: Build Electron App
-        run: pnpm run dist
+        run: pnpm run ${{ matrix.build-command }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Cleanup Artifacts for Linux (精确清理)
+      - name: Cleanup Artifacts for Linux
         if: startsWith(matrix.platform, 'ubuntu')
         run: |
           # 创建临时目录
@@ -83,8 +112,44 @@ jobs:
           echo "保留的发布文件："
           ls -la dist
 
-      - name: Rename files with architecture suffix
-        if: startsWith(matrix.platform, 'ubuntu')
+      - name: Cleanup Artifacts for macOS
+        if: matrix.platform == 'macos-latest'
+        run: |
+          # 创建临时目录
+          mkdir -p dist-temp
+          
+          # 只保留需要的文件类型
+          find dist -maxdepth 1 -type f \( -name "*.dmg" -o -name "*.pkg" -o -name "*.zip" -o -name "*.yml" \) -exec cp {} dist-temp/ \;
+          
+          # 替换原dist目录
+          rm -rf dist
+          mv dist-temp dist
+          
+          # 显示保留的文件（用于调试）
+          echo "保留的发布文件："
+          ls -la dist
+
+      - name: Cleanup Artifacts for Windows
+        if: matrix.platform == 'windows-latest'
+        run: |
+          # 创建临时目录
+          New-Item -ItemType Directory -Path dist-temp -Force | Out-Null
+          
+          # 只保留需要的文件类型
+          Get-ChildItem -Path dist -File | Where-Object {
+              $_.Name -like "*.exe" -or $_.Name -like "*.msi" -or $_.Name -like "*.zip" -or $_.Name -like "*.yml"
+          } | Copy-Item -Destination dist-temp/
+          
+          # 替换原dist目录
+          Remove-Item -Path dist -Recurse -Force
+          Rename-Item -Path dist-temp -NewName dist
+          
+          # 显示保留的文件（用于调试）
+          Write-Host "保留的发布文件："
+          Get-ChildItem -Path dist
+
+      - name: Rename files with architecture suffix (Linux/macOS)
+        if: startsWith(matrix.platform, 'ubuntu') || matrix.platform == 'macos-latest'
         run: |
           cd dist
           
@@ -115,6 +180,33 @@ jobs:
           echo "重命名后的文件:"
           ls -l
 
+      - name: Rename files with architecture suffix (Windows)
+        if: matrix.platform == 'windows-latest'
+        run: |
+          cd dist
+          
+          $ARCH_SUFFIX = "${{ matrix.arch-suffix }}"
+          if ($ARCH_SUFFIX -ne "x64" -and $ARCH_SUFFIX -ne "arm64") {
+            Write-Error "错误: 架构后缀不正确 - $ARCH_SUFFIX"
+            exit 1
+          }
+          
+          Get-ChildItem -File | ForEach-Object {
+            $file = $_
+            if ($file.Name -match "-$ARCH_SUFFIX\.[^.]+$") {
+              Write-Host "文件已包含架构后缀: $($file.Name)"
+            } else {
+              $filename = $file.BaseName
+              $extension = $file.Extension
+              $new_filename = "$filename-$ARCH_SUFFIX$extension"
+              Rename-Item -Path $file.FullName -NewName $new_filename
+              Write-Host "重命名: $($file.Name) -> $new_filename"
+            }
+          }
+          
+          Write-Host "重命名后的文件:"
+          Get-ChildItem -File
+
       - name: Extract version
         id: extract-version
         run: |
@@ -125,6 +217,7 @@ jobs:
           fi
           echo "appVersion=$VERSION" >> $GITHUB_OUTPUT
           echo "Extracted version: $VERSION"
+        shell: bash  # 统一使用bash确保跨平台兼容性
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4.0.0
