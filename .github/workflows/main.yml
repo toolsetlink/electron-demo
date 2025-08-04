@@ -10,7 +10,7 @@ on:
 jobs:
   publish-electron:
     outputs:
-      appVersion: ${{ stepssextract-version.outputs.appVersion }}
+      appVersion: ${{ steps.set_output.outputs.appVersion }}
 
     permissions:
       contents: write
