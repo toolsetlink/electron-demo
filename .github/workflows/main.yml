@@ -206,8 +206,14 @@ jobs:
       - name: Extract version
         id: extract-version
         run: |
+          # 优先从标签获取版本号
           if [[ "${{ github.ref }}" == refs/tags/* ]]; then
             VERSION=${{ github.ref_name }}
+          else
+            # 如果不是标签推送，从package.json读取版本号
+            VERSION=$(node -p "require('./package.json').version")
+            # 或者使用固定的默认值
+            # VERSION="dev-$(date +%Y%m%d)"
           fi
           echo "appVersion=$VERSION" >> $GITHUB_OUTPUT
           echo "Extracted version: $VERSION"
