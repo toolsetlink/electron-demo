@@ -134,7 +134,7 @@ jobs:
           fi
 
           # 先处理重复平台标识
-          for file in *; do
+          for file in *.yml; do
             if [ -f "$file" ]; then
               # 固定替换 -linux-linux 为 -linux
               if [[ "$file" == *-linux-linux* ]]; then
@@ -153,7 +153,7 @@ jobs:
               fi
           
               # 固定替换 x86_64-x64 为 -x64
-              if [[ "$file" == *x86_64-x64* ]]; then
+              if [[ "$file" == *-x86_64-x64* ]]; then
                 new_file="${file//x86_64-x64/-x64}"
                 mv "$file" "$new_file"
                 echo "替换重复标识: $file -> $new_file"
