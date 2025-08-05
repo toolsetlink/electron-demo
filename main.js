@@ -55,10 +55,7 @@ ipcMain.handle('check-for-updates', async () => {
     console.log(process.platform);
     console.log(process.arch);
 
-    // const FeedURL = `${this.httpUrl}/update?${paramsQuery}`;
     const FeedURL = `https://api.upgrade.toolsetlink.com/v1/electron/upgrade?electronKey=kPUtUMDIjBhS48q5771pow&versionName=${app.getVersion()}&appointVersionName=&devModelKey=&devKey=&platform=${process.platform}&arch=${process.arch}`;
-    // const FeedURL = `http://0.0.0.0:8888/v1/electron/upgrade?electronKey=kPUtUMDIjBhS48q5771pow&versionName=${app.getVersion()}&appointVersionName=&devModelKey=&devKey=&platform=${process.platform}&arch=${process.arch}`;
-    
     autoUpdater.setFeedURL({
       url: FeedURL,
       provider: 'generic',
@@ -70,14 +67,13 @@ ipcMain.handle('check-for-updates', async () => {
     const result = await autoUpdater.checkForUpdates();
     // 打印
     console.log("result: ",result);
-     
 
     if (!result || !result.updateInfo) {
       return {
         error: "无法获取更新信息",
         currentVersion: app.getVersion()
       };
-    } else if (result.updateInfo.version == app.getVersion()) {
+    } else if (result.updateInfo.version === app.getVersion()) {
       return {
         updateAvailable: false,
         currentVersion: app.getVersion()
@@ -125,11 +121,11 @@ ipcMain.handle('download-update', async () => {
     console.log(result);
 
     autoUpdater.setFeedURL({
-      url: result.updateInfo.url,
+      url: result.updateInfo.path,
       provider: 'generic',
     });
     
-    console.log('[流程] 下载更新开始，URL:', result.updateInfo.url);
+    console.log('[流程] 下载更新开始，URL:', result.updateInfo.path);
     
     try {
       console.error('[DEBUG] 进入 try');
