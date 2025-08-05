@@ -263,16 +263,18 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
-#  upgradeLink-upload:
-#    needs:  publish-electron  # 依赖于publish-electron作业完成
-#    permissions:
-#      contents: write
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Send a request to UpgradeLink
-#        uses: toolsetlink/upgradelink-action-electron@v1
-#        with:
-#          source-url: 'https://github.com/toolsetlink/electron-demo/releases/download/${{ needs.publish-electron.outputs.appVersion }}'
-#          access-key: ${{ secrets.UPGRADE_LINK_ACCESS_KEY }}  # ACCESS_KEY  密钥key
-#          tauri-key: ${{ secrets.UPGRADE_LINK_TAURI_KEY }}    # TAURI_KEY tauri 应用唯一标识
-#          github-token: ${{ secrets.GITHUB_TOKEN }}
+  upgradeLink-upload:
+    needs:  publish-electron  # 依赖于publish-electron作业完成
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send a request to UpgradeLink
+        uses: toolsetlink/upgradelink-action-electron@v1.0.0
+        with:
+          source-url: 'https://github.com/toolsetlink/electron-demo/releases/download/${{ needs.publish-electron.outputs.appVersion }}'
+          access-key: ${{ secrets.UPGRADE_LINK_ACCESS_KEY }}  # ACCESS_KEY  密钥key
+          electron-key: ${{ secrets.UPGRADE_LINK_ELECTRON_KEY }}    # ELECTRON_KEY electron 应用唯一标识
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          version: ${{ needs.publish-electron.outputs.appVersion }}
+          prompt-upgrade-content: '提示升级内容'
