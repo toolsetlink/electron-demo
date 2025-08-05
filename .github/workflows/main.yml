@@ -151,6 +151,14 @@ jobs:
                 echo "替换重复标识: $file -> $new_file"
                 file="$new_file"
               fi
+          
+              # 固定替换 x86_64-x64 为 -x64
+              if [[ "$file" == *x86_64-x64* ]]; then
+                new_file="${file//x86_64-x64/-x64}"
+                mv "$file" "$new_file"
+                echo "替换重复标识: $file -> $new_file"
+                file="$new_file"
+              fi
 
               # 处理架构后缀
               if [[ "$file" != *-"$ARCH_SUFFIX".* ]]; then
