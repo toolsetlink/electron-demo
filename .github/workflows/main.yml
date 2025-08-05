@@ -8,7 +8,7 @@ on:
       - '*.*.*'
 
 jobs:
-  publish-build:
+  electron-build:
     outputs:
       appVersion: ${{ steps.extract-version.outputs.appVersion }}
     permissions:
@@ -222,8 +222,8 @@ jobs:
           path: dist/*
           if-no-files-found: error
 
-  publish-electron:
-    needs: publish-build
+  electron-release:
+    needs: electron-build
     runs-on: ubuntu-22.04
     permissions:
       contents: write
@@ -254,8 +254,8 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ needs.publish-electron.outputs.appVersion }}
-          name: Release ${{ needs.publish-electron.outputs.appVersion }}
+          tag_name: ${{ needs.electron-build.outputs.appVersion }}
+          name: Release ${{ needs.electron-build.outputs.appVersion }}
           files: release-files/*
           draft: false
           prerelease: false
@@ -264,7 +264,7 @@ jobs:
 
 
   upgradeLink-upload:
-    needs:  publish-electron  # 依赖于publish-electron作业完成
+    needs:  electron-release  # 依赖于electron-release作业完成
     permissions:
       contents: write
     runs-on: ubuntu-latest
@@ -272,9 +272,9 @@ jobs:
       - name: Send a request to UpgradeLink
         uses: toolsetlink/upgradelink-action-electron@v1.0.0
         with:
-          source-url: 'https://github.com/toolsetlink/electron-demo/releases/download/${{ needs.publish-electron.outputs.appVersion }}'
+          source-url: 'https://github.com/toolsetlink/electron-demo/releases/download/${{ needs.electron-build.outputs.appVersion }}'
           access-key: ${{ secrets.UPGRADE_LINK_ACCESS_KEY }}  # ACCESS_KEY  密钥key
           electron-key: ${{ secrets.UPGRADE_LINK_ELECTRON_KEY }}    # ELECTRON_KEY electron 应用唯一标识
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          version: ${{ needs.publish-electron.outputs.appVersion }}
+          version: ${{ needs.electron-build.outputs.appVersion }}
           prompt-upgrade-content: '提示升级内容'
