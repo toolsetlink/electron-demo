@@ -206,10 +206,8 @@ jobs:
       - name: Extract version
         id: extract-version
         run: |
-          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
             VERSION=${{ github.ref_name }}
-          else
-            VERSION=$(node -p "require('./package.json').version")
           fi
           echo "appVersion=$VERSION" >> $GITHUB_OUTPUT
           echo "Extracted version: $VERSION"
