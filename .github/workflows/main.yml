@@ -8,7 +8,7 @@ on:
       - '*.*.*'
 
 jobs:
-  publish-electron:
+  publish-build:
     outputs:
       appVersion: ${{ steps.extract-version.outputs.appVersion }}
     permissions:
@@ -222,8 +222,8 @@ jobs:
           path: dist/*
           if-no-files-found: error
 
-  release:
-    needs: publish-electron
+  publish-electron:
+    needs: publish-build
     runs-on: ubuntu-22.04
     permissions:
       contents: write
