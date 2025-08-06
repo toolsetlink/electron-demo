@@ -25,6 +25,7 @@ function createWindow() {
   });
 }
 
+app.disableHardwareAcceleration();
 app.on('ready', () => {
   createWindow();
 

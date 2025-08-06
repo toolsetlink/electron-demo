@@ -1,7 +1,7 @@
 {
   "name": "electron-demo",
   "description": "A demo Electron application",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "author": {
     "name": "toolsetlink",
     "email": "toolsetlink@163.com"
@@ -22,8 +22,8 @@
   },
   "config": {
     "electron": {
-      "mirror": "https://cdn.npmmirror.com/binaries/electron/"
-    }
+        "mirror": "https://cdn.npmmirror.com/binaries/electron/"
+      }
   },
   "repository": {
     "type": "git",
@@ -63,10 +63,10 @@
   },
   "dependencies": {
     "app-builder-bin": "^4.2.0",
-    "electron-updater": "^6.6.2"
+    "electron-updater": "^6.6.2",
+    "fs-extra": "^11.2.0"
   },
   "devDependencies": {
-    "@electron-forge/publisher-github": "^7.8.2",
     "electron": "^37.2.3",
     "electron-builder": "^24.13.3",
     "serve": "^14.2.4"
