@@ -62,12 +62,12 @@
     }
   },
   "dependencies": {
-    "electron": "^37.2.3",
-    "electron-builder": "^24.13.3",
     "app-builder-bin": "^4.2.0",
     "electron-updater": "^6.6.2",
     "serve": "^14.2.4"
   },
   "devDependencies": {
+    "electron": "^37.2.3",
+    "electron-builder": "^24.13.3"
   }
 }
