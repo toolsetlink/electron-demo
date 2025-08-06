@@ -268,7 +268,8 @@ jobs:
 
 
   upgradeLink-upload:
-    needs:  electron-release  # 依赖于electron-release作业完成
+    # 同时依赖 electron-build 和 electron-release，确保能访问 electron-build 的输出
+    needs: [ electron-build, electron-release ]
     permissions:
       contents: write
     runs-on: ubuntu-latest
