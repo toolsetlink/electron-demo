@@ -6,10 +6,4 @@
 [UpgradeLink](http://upgrade.toolsetlink.com/)  全端支持，一站式应用升级分发平台及解决方案。
 
 
-[//]: # ( <img src="./img.png" width = "500" height = "500" alt="图片名称" />)
-
-[//]: # ()
-[//]: # (----)
-
-[//]: # ()
-[//]: # ( <img src="./img_1.png" width = "500" height = "550" alt="图片名称" />)
+ <img src="./img.png" width = "500"  alt="图片名称" />
