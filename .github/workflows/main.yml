@@ -268,19 +268,19 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
-#  upgradeLink-upload:
-#    # 同时依赖 electron-build 和 electron-release，确保能访问 electron-build 的输出
-#    needs: [ electron-build, electron-release ]
-#    permissions:
-#      contents: write
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Send a request to UpgradeLink
-#        uses: toolsetlink/upgradelink-action-electron@v1.0.0
-#        with:
-#          source-url: 'https://github.com/toolsetlink/electron-demo/releases/download/${{ needs.electron-build.outputs.appVersion }}'
-#          access-key: ${{ secrets.UPGRADE_LINK_ACCESS_KEY }}  # ACCESS_KEY  密钥key
-#          electron-key: ${{ secrets.UPGRADE_LINK_ELECTRON_KEY }}    # ELECTRON_KEY electron 应用唯一标识
-#          github-token: ${{ secrets.GITHUB_TOKEN }}
-#          version: ${{ needs.electron-build.outputs.appVersion }}
-#          prompt-upgrade-content: '提示升级内容'
+ upgradeLink-upload:
+   # 同时依赖 electron-build 和 electron-release，确保能访问 electron-build 的输出
+   needs: [ electron-build, electron-release ]
+   permissions:
+     contents: write
+   runs-on: ubuntu-latest
+   steps:
+     - name: Send a request to UpgradeLink
+       uses: toolsetlink/upgradelink-action-electron@v1.0.0
+       with:
+         source-url: 'https://github.com/toolsetlink/electron-demo/releases/download/${{ needs.electron-build.outputs.appVersion }}'
+         access-key: ${{ secrets.UPGRADE_LINK_ACCESS_KEY }}  # ACCESS_KEY  密钥key
+         electron-key: ${{ secrets.UPGRADE_LINK_ELECTRON_KEY }}    # ELECTRON_KEY electron 应用唯一标识
+         github-token: ${{ secrets.GITHUB_TOKEN }}
+         version: ${{ needs.electron-build.outputs.appVersion }}
+         prompt-upgrade-content: '提示升级内容'
