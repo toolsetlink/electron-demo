@@ -58,7 +58,19 @@ jobs:
       - uses: pnpm/action-setup@v4
         with:
           version: 9
-          run_install: true
+          run_install: false
+
+      - name: Create .pnpmrc configuration
+        run: |
+          echo "node-linker=hoisted" >> .pnpmrc
+          echo "shamefully-hoist=true" >> .pnpmrc
+          cat .pnpmrc
+
+      - name: Install dependencies with pnpm
+        run: pnpm install --frozen-lockfile
+
+      - name: List installed dependencies
+        run: pnpm list
 
       - name: setup node
         uses: actions/setup-node@v4
