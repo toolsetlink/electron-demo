@@ -55,28 +55,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-          run_install: false
-
-      - name: Create .pnpmrc configuration
-        run: |
-          echo "node-linker=hoisted" >> .pnpmrc
-          echo "shamefully-hoist=true" >> .pnpmrc
-          cat .pnpmrc
-
-      - name: Install dependencies with pnpm
-        run: pnpm install --frozen-lockfile
-
-      - name: List installed dependencies
-        run: pnpm list
-
       - name: setup node
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-          cache: 'pnpm'
+          cache: 'npm'
+
+      - name: Install dependencies with npm
+        run: npm install
+
+      - name: List installed dependencies
+        run: npm list
 
       - name: install dependencies (ubuntu only)
         if: startsWith(matrix.platform, 'ubuntu')
@@ -93,7 +82,7 @@ jobs:
         run: pnpm install
 
       - name: Install rimraf
-        run: pnpm add rimraf -D
+        run: npm install rimraf --save-dev
 
       - name: Build Electron App
         # 直接执行矩阵中定义的完整构建命令

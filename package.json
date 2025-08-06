@@ -1,7 +1,7 @@
 {
   "name": "electron-demo",
   "description": "A demo Electron application",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "author": {
     "name": "toolsetlink",
     "email": "toolsetlink@163.com"
@@ -69,17 +69,12 @@
     }
   },
   "dependencies": {
-    "app-builder-bin": "^4.2.0",
-    "builder-util-runtime": "^9.3.1",
-    "electron-updater": "^6.6.2",
-    "fs-extra": "^11.2.0",
-    "graceful-fs": "^4.2.11",
-    "jsonfile": "^6.1.0",
-    "universalify": "^2.0.1"
-  },
-  "devDependencies": {
     "electron": "^37.2.3",
     "electron-builder": "^24.13.3",
+    "app-builder-bin": "^4.2.0",
+    "electron-updater": "^6.6.2",
     "serve": "^14.2.4"
+  },
+  "devDependencies": {
   }
 }
