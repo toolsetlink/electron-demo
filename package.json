@@ -1,7 +1,7 @@
 {
   "name": "electron-demo",
   "description": "A demo Electron application",
-  "version": "1.4.2",
+  "version": "1.4.4",
   "author": {
     "name": "toolsetlink",
     "email": "toolsetlink@163.com"
@@ -65,6 +65,7 @@
     "app-builder-bin": "^4.2.0",
     "electron-updater": "^6.6.2",
     "fs-extra": "^11.2.0",
+    "graceful-fs": "^4.2.11",
     "universalify": "^2.0.1"
   },
   "devDependencies": {
