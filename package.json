@@ -1,7 +1,7 @@
 {
   "name": "electron-demo",
   "description": "A demo Electron application",
-  "version": "1.4.7",
+  "version": "1.5.0",
   "author": {
     "name": "toolsetlink",
     "email": "toolsetlink@163.com"
@@ -11,12 +11,12 @@
   "scripts": {
     "start": "electron .",
     "dev": "electron . --watch",
-    "build:all": "npx electron-builder",
-    "build:mac-arm64": "npx electron-builder --mac --arm64 --publish always --config.publish.channel=latest-arm64",
-    "build:mac-x64": "npx electron-builder --mac --x64 --publish always --config.publish.channel=latest-x64",
-    "build:win-x64": "npx electron-builder --win --x64 --publish always --config.publish.channel=latest-win-x64",
-    "build:linux-arm64": "npx electron-builder --linux --arm64 --publish always --config.publish.channel=latest-linux-arm64",
-    "build:linux-x64": "npx electron-builder --linux --x64 --publish always --config.publish.channel=latest-linux-x64",
+    "build:all": "yarn electron-builder",
+    "build:mac-arm64": "yarn electron-builder --mac --arm64 --publish always --config.publish.channel=latest-arm64",
+    "build:mac-x64": "yarn electron-builder --mac --x64 --publish always --config.publish.channel=latest-x64",
+    "build:win-x64": "yarn electron-builder --win --x64 --publish always --config.publish.channel=latest-win-x64",
+    "build:linux-arm64": "yarn electron-builder --linux --arm64 --publish always --config.publish.channel=latest-linux-arm64",
+    "build:linux-x64": "yarn electron-builder --linux --x64 --publish always --config.publish.channel=latest-linux-x64",
     "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "node node_modules/electron/install.js"
   },
@@ -42,13 +42,6 @@
       "provider": "generic",
       "url": "./dist/"
     },
-    "files": [
-      "**/*",
-      "node_modules/**/*"
-    ],
-    "asarUnpack": [
-      "node_modules/**/*"
-    ],
     "mac": {
       "category": "public.app-category.developer-tools",
       "artifactName": "${productName}-${version}-mac-${arch}.${ext}"

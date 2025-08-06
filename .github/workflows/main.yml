@@ -23,33 +23,33 @@ jobs:
             artifact-name: ubuntu-x86_64
             arch-suffix: x64
             # 直接定义完整的构建命令，包含通道信息
-            build-command: "npx electron-builder --linux --x64 --publish always --config.publish.channel=latest-linux"
+            build-command: "yarn electron-builder --linux --x64 --publish always --config.publish.channel=latest-linux"
 
           - platform: ubuntu-22.04
             target: aarch64-unknown-linux-gnu
             artifact-name: ubuntu-aarch64
             arch-suffix: arm64
-            build-command: "npx electron-builder --linux --arm64 --publish always --config.publish.channel=latest-linux"
+            build-command: "yarn electron-builder --linux --arm64 --publish always --config.publish.channel=latest-linux"
 
           # macOS 平台
           - platform: macos-latest
             target: aarch64-apple-darwin
             artifact-name: macos-arm64
             arch-suffix: arm64
-            build-command: "npx electron-builder --mac --arm64 --publish always --config.publish.channel=latest-mac"
+            build-command: "yarn electron-builder --mac --arm64 --publish always --config.publish.channel=latest-mac"
 
           - platform: macos-latest
             target: x86_64-apple-darwin
             artifact-name: macos-x64
             arch-suffix: x64
-            build-command: "npx electron-builder --mac --x64 --publish always --config.publish.channel=latest-mac"
+            build-command: "yarn electron-builder --mac --x64 --publish always --config.publish.channel=latest-mac"
 
           # Windows 平台
           - platform: windows-latest
             target: x86_64-pc-windows-msvc
             artifact-name: windows-x64
             arch-suffix: x64
-            build-command: "npx electron-builder --win --x64 --publish always --config.publish.channel=latest-win"
+            build-command: "yarn electron-builder --win --x64 --publish always --config.publish.channel=latest-win"
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -59,13 +59,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-          cache: 'npm'
+          cache: 'yarn'
 
-      - name: Install dependencies with npm
-        run: npm install
+      - name: Install dependencies with yarn
+        run: yarn install
 
       - name: List installed dependencies
-        run: npm list
+        run: yarn list
 
       - name: install dependencies (ubuntu only)
         if: startsWith(matrix.platform, 'ubuntu')
@@ -79,10 +79,10 @@ jobs:
           brew install automake autoconf libtool
 
       - name: install frontend dependencies
-        run: pnpm install
+        run: yarn install
 
       - name: Install rimraf
-        run: npm install rimraf --save-dev
+        run: yarn add rimraf --dev
 
       - name: Build Electron App
         # 直接执行矩阵中定义的完整构建命令
