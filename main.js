@@ -52,6 +52,8 @@ app.on('activate', () => {
 // IPC通信：检查更新
 ipcMain.handle('check-for-updates', async () => {
   try {
+
+    // 打印相关参数
     console.log(app.getVersion());
     console.log(process.platform);
     console.log(process.arch);
@@ -66,15 +68,17 @@ ipcMain.handle('check-for-updates', async () => {
     };
 
     const result = await autoUpdater.checkForUpdates();
-    // 打印
+    // 打印返回结果
     console.log("result: ",result);
 
     if (!result || !result.updateInfo) {
+      // 接口调用失败
       return {
         error: "无法获取更新信息",
         currentVersion: app.getVersion()
       };
     } else if (result.updateInfo.version === app.getVersion()) {
+      // 返回的版本号与当前一直，则代表当前为最新版本
       return {
         updateAvailable: false,
         currentVersion: app.getVersion()
@@ -92,7 +96,9 @@ ipcMain.handle('check-for-updates', async () => {
       currentVersion: app.getVersion()
     };
   } catch (error) {
-   
+    if (error.code === 'ETIMEDOUT') {
+      return { error: '网络请求超时，请检查网络连接', currentVersion: app.getVersion() };
+    }
     return {
       error: error.message,
       currentVersion: app.getVersion()
@@ -103,12 +109,13 @@ ipcMain.handle('check-for-updates', async () => {
 // IPC通信：下载更新
 ipcMain.handle('download-update', async () => {
   try {
+
+    // 打印配置信息
     console.log(app.getVersion());
     console.log(process.platform);
     console.log(process.arch);
 
     const FeedURL = `https://api.upgrade.toolsetlink.com/v1/electron/upgrade?electronKey=kPUtUMDIjBhS48q5771pow&versionName=${app.getVersion()}&appointVersionName=&devModelKey=&devKey=&platform=${process.platform}&arch=${process.arch}`;
-
     autoUpdater.setFeedURL({
       url: FeedURL,
       provider: 'generic',
@@ -118,18 +125,15 @@ ipcMain.handle('download-update', async () => {
     };
     const result = await autoUpdater.checkForUpdates();
 
-    // 打印
+    // 打印返回结果
     console.log(result);
 
     autoUpdater.setFeedURL({
       url: result.updateInfo.path,
       provider: 'generic',
     });
-    
     console.log('[流程] 下载更新开始，URL:', result.updateInfo.path);
-    
     try {
-      console.error('[DEBUG] 进入 try');
       await autoUpdater.downloadUpdate();
       console.log('[流程] 下载更新完成');
     } catch (e) {
@@ -137,6 +141,8 @@ ipcMain.handle('download-update', async () => {
       console.error('[DEBUG] 错误堆栈:', e.stack);
       throw e;
     }
+
+
     return { success: true };
   } catch (error) {
     return { success: false, error: error.message };
